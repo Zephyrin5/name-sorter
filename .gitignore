@@ -1,0 +1,27 @@
+artifacts/
+/packages/
+riderModule.iml
+/_ReSharper.Caches/
+publish/
+
+# JetBrains Rider / ReSharper
+.idea/
+*.DotSettings.user
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Misc
+*.zip
+*.log
+
+# Repomix - generated codebase dumps. repomix.config.js writes them to
+# .repomix/; repomix-output.* is the tool's default when run without it.
+/.repomix/
+repomix-output.*
+# .NET build outputs
+**/bin/
+**/obj/
+/sorted-names-list.txt

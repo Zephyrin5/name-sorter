@@ -1,0 +1,9 @@
+<Project>
+    <PropertyGroup>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsAotCompatible Condition="!$(MSBuildProjectName.EndsWith('Tests'))">true</IsAotCompatible>
+        <ArtifactsPath>$(MSBuildThisFileDirectory)artifacts</ArtifactsPath>
+        <RootNamespace>NameSorter.$(MSBuildProjectName)</RootNamespace>
+    </PropertyGroup>
+</Project>
