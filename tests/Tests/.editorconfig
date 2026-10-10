@@ -1,0 +1,8 @@
+﻿root = true
+
+# Target all C# files
+[**/*Tests.cs]
+
+# Turn off JetBrains' native Rider rule (Nullable Warning Suppression Is Used)
+resharper_nullable_warning_suppression_is_used_highlighting = none
+
