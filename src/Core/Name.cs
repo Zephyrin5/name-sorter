@@ -1,8 +1,8 @@
 namespace NameSorter.Core;
 
 /// <summary>
-/// A person's name: one to three given names followed by a last name.
-/// with no whitespace within individual parts.
+/// A person's name consisting of one to three given names followed by
+/// a last name, with no whitespace within individual parts.
 /// </summary>
 public sealed class Name
 {
