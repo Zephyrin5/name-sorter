@@ -57,7 +57,7 @@ public class FileNameSinkTests
     }
 
     [Fact]
-    public void Write_FailsMidWrite_KeepsExistingFileAndLeavesNoTempFiles()
+    public void Write_EnumerationFails_PreservesExistingFileAndCleansUpTempFile()
     {
         using TempDirectory dir = new TempDirectory();
         File.WriteAllText(dir.File(OutputFile), "previous output");
@@ -68,7 +68,7 @@ public class FileNameSinkTests
         Assert.Equal([dir.File(OutputFile)], Directory.GetFiles(dir.DirectoryPath));
     }
 
-    /// <summary>Yields one name, then fails, as a disk error mid-write would.</summary>
+    /// <summary>Yields one name, then throws to exercise failure during writing.</summary>
     private sealed class FailsAfterFirstName : IReadOnlyList<Name>
     {
         public int Count => 2;

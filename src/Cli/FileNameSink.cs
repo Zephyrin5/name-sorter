@@ -21,10 +21,17 @@ internal sealed class FileNameSink(string path) : INameSink
             File.WriteAllLines(tempPath, names.Select(name => name.ToString()));
             File.Move(tempPath, destination, true);
         }
-        finally
+        catch
         {
-            if (File.Exists(tempPath))
+            try
+            {
                 File.Delete(tempPath);
+            }
+            catch (Exception cleanupError) when (cleanupError is IOException or UnauthorizedAccessException)
+            {
+                // Preserve the original write or move failure.
+            }
+            throw;
         }
     }
 }
