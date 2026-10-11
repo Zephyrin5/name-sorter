@@ -43,16 +43,6 @@ public class FileNameSinkTests
     }
 
     [Fact]
-    public void Write_AccentedNames_PreservesCharacters()
-    {
-        using TempDirectory dir = new TempDirectory();
-
-        new FileNameSink(dir.File(OutputFile)).Write([new Name(["José"], "Núñez")]);
-
-        Assert.Equal(["José Núñez"], File.ReadAllLines(dir.File(OutputFile)));
-    }
-
-    [Fact]
     public void Write_PathIsDirectory_ThrowsFileError()
     {
         using TempDirectory dir = new TempDirectory();

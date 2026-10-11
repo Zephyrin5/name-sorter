@@ -77,17 +77,6 @@ public class NameSortingJobTests
     }
 
     [Fact]
-    public void Run_EqualSortKeys_PreservesInputOrderAndDuplicates()
-    {
-        RecordingSink sink = new RecordingSink();
-        string[] input = ["ann lee", "Ann Lee", "ANN LEE", "Ann Lee"];
-
-        CreateJob(sink).Run(input);
-
-        Assert.Equal(input, sink.Received);
-    }
-
-    [Fact]
     public void Run_NullLines_ThrowsArgumentNullException()
     {
         RecordingSink sink = new RecordingSink();

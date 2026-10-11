@@ -1,6 +1,4 @@
 using NameSorter.Tests.Helpers;
-using System.Diagnostics;
-using System.Text;
 
 namespace NameSorter.Tests.Integration;
 
@@ -28,7 +26,7 @@ public class ProgramTests
         string input = Path.Combine(inputDirectory, "names list.txt");
         File.WriteAllLines(input, BriefExample.Input);
 
-        CliResult result = await RunAsync(dir.DirectoryPath, input);
+        CliResult result = await CliRunner.RunAsync(dir.DirectoryPath, input);
 
         AssertSuccess(dir, result, BriefExample.Expected);
         Assert.False(File.Exists(Path.Combine(inputDirectory, OutputFile)));
@@ -41,7 +39,7 @@ public class ProgramTests
         File.WriteAllLines(dir.File("in.txt"), ["Bob Lee", "Ann Lee"]);
         await File.WriteAllTextAsync(dir.File(OutputFile), "stale content longer than the replacement\nextra line\n");
 
-        CliResult result = await RunAsync(dir.DirectoryPath, "in.txt");
+        CliResult result = await CliRunner.RunAsync(dir.DirectoryPath, "in.txt");
 
         AssertSuccess(dir, result, ["Ann Lee", "Bob Lee"]);
     }
@@ -64,7 +62,7 @@ public class ProgramTests
                 .Select(x => x.Line)
         ];
 
-        CliResult result = await RunAsync(dir.DirectoryPath, "in.txt");
+        CliResult result = await CliRunner.RunAsync(dir.DirectoryPath, "in.txt");
 
         AssertSuccess(dir, result, expected);
     }
@@ -79,7 +77,7 @@ public class ProgramTests
         await File.WriteAllTextAsync(dir.File("in.txt"),
             string.Join(newline, "Bob Lee", "", " \t ", "  Ann\tMarie   Lee  ", ""));
 
-        CliResult result = await RunAsync(dir.DirectoryPath, "in.txt");
+        CliResult result = await CliRunner.RunAsync(dir.DirectoryPath, "in.txt");
 
         AssertSuccess(dir, result, ["Ann Marie Lee", "Bob Lee"]);
     }
@@ -93,7 +91,7 @@ public class ProgramTests
         await File.WriteAllTextAsync(dir.File("in.txt"), input);
         await File.WriteAllTextAsync(dir.File(OutputFile), "old output");
 
-        CliResult result = await RunAsync(dir.DirectoryPath, "in.txt");
+        CliResult result = await CliRunner.RunAsync(dir.DirectoryPath, "in.txt");
 
         AssertSuccess(dir, result, []);
         Assert.Equal(0L, new FileInfo(dir.File(OutputFile)).Length);
@@ -106,7 +104,7 @@ public class ProgramTests
         string[] input = ["ann lee", "Ann Lee", "ANN LEE", "Ann Lee"];
         File.WriteAllLines(dir.File("in.txt"), input);
 
-        CliResult result = await RunAsync(dir.DirectoryPath, "in.txt");
+        CliResult result = await CliRunner.RunAsync(dir.DirectoryPath, "in.txt");
 
         AssertSuccess(dir, result, input);
     }
@@ -117,7 +115,7 @@ public class ProgramTests
         using TempDirectory dir = new TempDirectory();
         File.WriteAllLines(dir.File("in.txt"), ["José Núñez", "Zoë Müller"]);
 
-        CliResult result = await RunAsync(dir.DirectoryPath, "in.txt");
+        CliResult result = await CliRunner.RunAsync(dir.DirectoryPath, "in.txt");
 
         AssertSuccess(dir, result, ["Zoë Müller", "José Núñez"]);
     }
@@ -128,7 +126,7 @@ public class ProgramTests
     {
         using TempDirectory dir = new TempDirectory();
 
-        CliResult result = await RunAsync(dir.DirectoryPath, args);
+        CliResult result = await CliRunner.RunAsync(dir.DirectoryPath, args);
 
         Assert.True(result.ExitCode == 1, $"{description}: exit code {result.ExitCode}: {result.Stderr}");
         Assert.Contains("Usage:", result.Stderr);
@@ -146,7 +144,7 @@ public class ProgramTests
         if (existingOutput)
             await File.WriteAllTextAsync(dir.File(OutputFile), "previous run");
 
-        CliResult result = await RunAsync(dir.DirectoryPath, "in.txt");
+        CliResult result = await CliRunner.RunAsync(dir.DirectoryPath, "in.txt");
 
         Assert.Equal(2, result.ExitCode);
         Assert.Contains("Line 4:", result.Stderr);
@@ -166,7 +164,7 @@ public class ProgramTests
     {
         using TempDirectory dir = new TempDirectory();
 
-        CliResult result = await RunAsync(dir.DirectoryPath, "missing.txt");
+        CliResult result = await CliRunner.RunAsync(dir.DirectoryPath, "missing.txt");
 
         Assert.Equal(3, result.ExitCode);
         Assert.Contains("An I/O error occurred.", result.Stderr);
@@ -181,65 +179,12 @@ public class ProgramTests
         await File.WriteAllTextAsync(dir.File("in.txt"), "Ann Lee");
         Directory.CreateDirectory(dir.File(OutputFile));
 
-        CliResult result = await RunAsync(dir.DirectoryPath, "in.txt");
+        CliResult result = await CliRunner.RunAsync(dir.DirectoryPath, "in.txt");
 
         Assert.Equal(3, result.ExitCode);
         Assert.Contains("An I/O error occurred.", result.Stderr);
         Assert.Empty(result.Stdout);
         Assert.True(Directory.Exists(dir.File(OutputFile)));
-    }
-
-    private static async Task<CliResult> RunAsync(string workingDirectory, params string[] args)
-    {
-        string dll = Path.Combine(AppContext.BaseDirectory, "name-sorter.dll");
-        foreach (string file in new[]
-                 {
-                     "name-sorter.dll",
-                     "name-sorter.deps.json",
-                     "name-sorter.runtimeconfig.json",
-                     "NameSorter.Core.dll"
-                 })
-            Assert.True(File.Exists(Path.Combine(AppContext.BaseDirectory, file)),
-                $"CLI launch file is missing: {file}");
-
-        ProcessStartInfo info = new ProcessStartInfo(Environment.GetEnvironmentVariable("DOTNET_HOST_PATH") ?? "dotnet")
-        {
-            WorkingDirectory = workingDirectory,
-            UseShellExecute = false,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            StandardOutputEncoding = Encoding.UTF8,
-            StandardErrorEncoding = Encoding.UTF8
-        };
-        info.ArgumentList.Add(dll);
-        foreach (string arg in args)
-            info.ArgumentList.Add(arg);
-
-        using Process process = Process.Start(info)
-                                ?? throw new InvalidOperationException("Could not start the CLI.");
-        using CancellationTokenSource timeout = new CancellationTokenSource(TimeSpan.FromSeconds(30));
-        var stdout = process.StandardOutput.ReadToEndAsync(timeout.Token);
-        var stderr = process.StandardError.ReadToEndAsync(timeout.Token);
-
-        try
-        {
-            await process.WaitForExitAsync(timeout.Token);
-            return new CliResult(process.ExitCode, await stdout, await stderr);
-        }
-        catch (OperationCanceledException) when (timeout.IsCancellationRequested)
-        {
-            if (!process.HasExited)
-                process.Kill(true);
-            await process.WaitForExitAsync(CancellationToken.None);
-            try
-            {
-                await Task.WhenAll(stdout, stderr);
-            }
-            catch (OperationCanceledException)
-            {
-            }
-            throw new TimeoutException("The CLI did not finish within 30 seconds.");
-        }
     }
 
     private static void AssertSuccess(TempDirectory dir, CliResult result, string[] expected)
@@ -250,7 +195,4 @@ public class ProgramTests
         string expectedConsole = string.Concat(expected.Select(line => line + Environment.NewLine));
         Assert.Equal(expectedConsole, result.Stdout);
     }
-
-    // Helpers
-    private sealed record CliResult(int ExitCode, string Stdout, string Stderr);
 }

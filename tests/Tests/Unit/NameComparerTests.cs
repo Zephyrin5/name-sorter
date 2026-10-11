@@ -16,7 +16,11 @@ public class NameComparerTests
     [Fact]
     public void Compare_DifferentLastNames_OrdersByLastName()
     {
-        Assert.True(_comparer.Compare(NameOf("Zed Adams"), NameOf("Adam Baker")) < 0);
+        Name a = NameOf("Zed Adams");
+        Name b = NameOf("Adam Baker");
+
+        Assert.True(_comparer.Compare(a, b) < 0);
+        Assert.True(_comparer.Compare(b, a) > 0);
     }
 
     [Fact]
@@ -53,15 +57,6 @@ public class NameComparerTests
     public void Compare_FewerGivenNamesWithMatchingPrefix_SortsFirst()
     {
         Assert.True(_comparer.Compare(NameOf("Ann Lee"), NameOf("Ann Marie Lee")) < 0);
-    }
-
-    [Fact]
-    public void Compare_ReversingArguments_ReversesSign()
-    {
-        Name a = NameOf("Ann Lee");
-        Name b = NameOf("Bob Lee");
-
-        Assert.Equal(-Math.Sign(_comparer.Compare(a, b)), Math.Sign(_comparer.Compare(b, a)));
     }
 
     [Fact]

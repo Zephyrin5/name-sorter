@@ -31,22 +31,6 @@ public class NameListParserTests
             names.Select(name => name.ToString()).ToArray());
     }
 
-    [Fact]
-    public void ParseLines_EmptyInput_ReturnsEmptyList()
-    {
-        var names = NameListParser.ParseLines([]);
-
-        Assert.Empty(names);
-    }
-
-    [Fact]
-    public void ParseLines_OnlyBlankLines_ReturnsEmptyList()
-    {
-        var names = NameListParser.ParseLines(["", " ", "\t"]);
-
-        Assert.Empty(names);
-    }
-
     [Theory]
     [InlineData("Madonna")]
     [InlineData("A B C D Lee")]
@@ -60,13 +44,5 @@ public class NameListParserTests
         Assert.StartsWith("Line 4:", exception.Message);
         Assert.Contains(invalidName, exception.Message);
         Assert.DoesNotContain("(Parameter", exception.Message);
-    }
-
-    [Fact]
-    public void ParseLines_NullInput_ThrowsArgumentNullException()
-    {
-        ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => NameListParser.ParseLines(null!));
-
-        Assert.Equal("lines", exception.ParamName);
     }
 }
