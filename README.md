@@ -45,7 +45,7 @@ Exit codes: `0` success, `1` invalid arguments, `2` invalid input, `3` file read
 
 - **Core:** `Name` holds immutable, validated name parts; `NameParser` parses individual names; `NameComparer` defines ordering. No file or console I/O.
 - **Cli:** `NameListParser` handles lines and line numbers; `NameSortingJob` coordinates parsing, sorting and output; `INameSink` abstracts file and console output. `Program.cs` configures the application and maps failures to exit codes.
-- **Tests:** Unit tests cover the model, parsers, comparer and console sink. Integration tests cover the file sink and run the built CLI against real files, including a 1,000-name input.
+- **Tests:** Unit tests cover the model, parsers, comparer, job orchestration and console sink. Integration tests cover the file sink and run the built CLI against real files, including a 1,000-name input.
 
 `INameSink` represents the two required output destinations. Adding another destination requires a new implementation and an entry in the sink array. Parsing and comparison are tested directly; file reading uses the standard library and is covered by integration tests.
 
