@@ -1,8 +1,8 @@
 ﻿namespace NameSorter.Core;
 
 /// <summary>
-/// Orders names by last name, then by each given name in turn.
-/// Comparison is case-insensitive and uses the invariant culture.
+///     Orders names by last name, then by each given name in turn.
+///     Comparison is case-insensitive and uses the invariant culture.
 /// </summary>
 public sealed class NameComparer : IComparer<Name>
 {

@@ -27,7 +27,7 @@ public class NameListParserTests
         var names = NameListParser.ParseLines(lines);
 
         Assert.Equal(
-            ["Bob Lee", "Ann Smith" ],
+            ["Bob Lee", "Ann Smith"],
             names.Select(name => name.ToString()).ToArray());
     }
 

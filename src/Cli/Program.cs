@@ -1,7 +1,6 @@
 using NameSorter.Cli;
 using NameSorter.Core;
 using System.Text;
-
 const string outputFileName = "sorted-names-list.txt";
 
 if (args.Length != 1 || string.IsNullOrWhiteSpace(args[0]))

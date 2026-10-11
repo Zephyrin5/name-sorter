@@ -45,8 +45,7 @@ public class NameSortingJobTests
     public void Run_CustomComparer_UsesProvidedOrdering()
     {
         RecordingSink sink = new RecordingSink();
-        IComparer<Name> comparer = Comparer<Name>.Create(
-            (x, y) => StringComparer.Ordinal.Compare(y.LastName, x.LastName));
+        IComparer<Name> comparer = Comparer<Name>.Create((x, y) => StringComparer.Ordinal.Compare(y.LastName, x.LastName));
 
         new NameSortingJob(comparer, [sink]).Run(["Ann Lee", "Bob Smith"]);
 
@@ -60,8 +59,7 @@ public class NameSortingJobTests
     {
         RecordingSink sink = new RecordingSink();
 
-        FormatException exception = Assert.Throws<FormatException>(
-            () => CreateJob(sink).Run(["Ann Lee", invalidName]));
+        FormatException exception = Assert.Throws<FormatException>(() => CreateJob(sink).Run(["Ann Lee", invalidName]));
 
         Assert.StartsWith("Line 2:", exception.Message);
         Assert.Equal(0, sink.WriteCount);

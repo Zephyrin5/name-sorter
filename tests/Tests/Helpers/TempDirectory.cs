@@ -6,13 +6,13 @@ internal sealed class TempDirectory : IDisposable
         Directory.CreateDirectory(
             Path.Combine(Path.GetTempPath(), $"NameSorter tests {Guid.NewGuid():N}")).FullName;
 
-    public string File(string name)
-    {
-        return Path.Combine(DirectoryPath, name);
-    }
-
     public void Dispose()
     {
         Directory.Delete(DirectoryPath, true);
+    }
+
+    public string File(string name)
+    {
+        return Path.Combine(DirectoryPath, name);
     }
 }

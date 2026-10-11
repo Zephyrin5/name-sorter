@@ -1,6 +1,6 @@
 namespace NameSorter.Tests.Helpers;
 
-public static class NameGenerator
+internal static class NameGenerator
 {
     public static string[] Generate(int count, int seed)
     {

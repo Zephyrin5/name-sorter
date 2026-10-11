@@ -1,9 +1,10 @@
 ﻿using NameSorter.Cli;
 using NameSorter.Core;
+
 namespace NameSorter.Tests.Helpers;
 
 /// <summary>
-/// Records received names, write count, and optionally invocation order.
+///     Records received names, write count, and optionally invocation order.
 /// </summary>
 internal sealed class RecordingSink(string label = "", List<string>? calls = null) : INameSink
 {

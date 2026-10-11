@@ -65,15 +65,14 @@ public class FileNameSinkTests
             exception is IOException or UnauthorizedAccessException,
             $"Unexpected exception: {exception}");
     }
-    
+
     [Fact]
     public void Write_FailsMidWrite_KeepsExistingFileAndLeavesNoTempFiles()
     {
         using TempDirectory dir = new TempDirectory();
         File.WriteAllText(dir.File(OutputFile), "previous output");
 
-        Assert.Throws<IOException>(
-            () => new FileNameSink(dir.File(OutputFile)).Write(new FailsAfterFirstName()));
+        Assert.Throws<IOException>(() => new FileNameSink(dir.File(OutputFile)).Write(new FailsAfterFirstName()));
 
         Assert.Equal("previous output", File.ReadAllText(dir.File(OutputFile)));
         Assert.Equal([dir.File(OutputFile)], Directory.GetFiles(dir.DirectoryPath));
@@ -90,9 +89,14 @@ public class FileNameSinkTests
         public IEnumerator<Name> GetEnumerator()
         {
             for (int i = 0; i < Count; i++)
+            {
                 yield return this[i];
+            }
         }
 
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
     }
 }

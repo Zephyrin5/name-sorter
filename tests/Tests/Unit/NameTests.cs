@@ -13,45 +13,41 @@ public class NameTests
         string[] given = [.. Enumerable.Range(1, count).Select(i => $"G{i}")];
 
         Name name = new Name(given, "Smith");
-        
+
         Assert.Equal(given, name.GivenNames);
     }
 
     [Fact]
     public void Constructor_NoGivenNames_Throws()
     {
-        ArgumentException exception = Assert.Throws<ArgumentException>(
-            () => new Name([], "Smith"));
+        ArgumentException exception = Assert.Throws<ArgumentException>(() => new Name([], "Smith"));
         Assert.Equal("givenNames", exception.ParamName);
     }
 
     [Fact]
     public void Constructor_FourGivenNames_Throws()
     {
-        ArgumentException exception = Assert.Throws<ArgumentException>(
-            () => new Name(["A", "B", "C", "D"], "Smith"));
-        
+        ArgumentException exception = Assert.Throws<ArgumentException>(() => new Name(["A", "B", "C", "D"], "Smith"));
+
         Assert.Equal("givenNames", exception.ParamName);
     }
 
     [Fact]
     public void Constructor_NullGivenNames_ThrowsArgumentNullException()
     {
-        ArgumentNullException exception = Assert.Throws<ArgumentNullException>(
-            () => new Name(null!, "Smith"));
-        
+        ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => new Name(null!, "Smith"));
+
         Assert.Equal("givenNames", exception.ParamName);
     }
-    
+
     [Fact]
     public void Constructor_NullLastName_ThrowsArgumentNullException()
     {
-        ArgumentNullException exception = Assert.Throws<ArgumentNullException>(
-            () => new Name(["Ann"], null!));
+        ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => new Name(["Ann"], null!));
 
         Assert.Equal("lastName", exception.ParamName);
     }
-    
+
 
     [Theory]
     [InlineData("")]
@@ -59,19 +55,18 @@ public class NameTests
     [InlineData(null)]
     public void Constructor_BlankGivenName_Throws(string? given)
     {
-        ArgumentException exception = Assert.Throws<ArgumentException>(
-            () => new Name(["Ann", given!], "Smith"));
-        
+        ArgumentException exception = Assert.Throws<ArgumentException>(() => new Name(["Ann", given!], "Smith"));
+
         Assert.Equal("givenNames", exception.ParamName);
     }
-    
+
     [Theory]
     [InlineData("")]
     [InlineData("   ")]
     public void Constructor_BlankLastName_Throws(string lastName)
     {
         ArgumentException exception = Assert.Throws<ArgumentException>(() => new Name(["Ann"], lastName));
-        
+
         Assert.Equal("lastName", exception.ParamName);
     }
 
@@ -110,7 +105,7 @@ public class NameTests
 
         Assert.Equal("Ann Smith", name.ToString());
     }
-    
+
     [Fact]
     public void ToString_JoinsGivenNamesThenLastName()
     {

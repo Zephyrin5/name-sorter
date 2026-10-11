@@ -7,7 +7,18 @@ namespace NameSorter.Tests.Integration;
 public class ProgramTests
 {
     private const string OutputFile = "sorted-names-list.txt";
-    
+
+    // Invalid arguments and input
+
+    public static TheoryData<string, string[]> InvalidArguments =>
+        new TheoryData<string, string[]>
+        {
+            { "No arguments", [] },
+            { "Empty path", [""] },
+            { "Whitespace-only path", ["   "] },
+            { "Multiple paths", ["one.txt", "two.txt"] }
+        };
+
     // Successful sorting and output
     [Fact]
     public async Task Run_BriefExample_PrintsNamesAndWritesFileInWorkingDirectory()
@@ -111,17 +122,6 @@ public class ProgramTests
         AssertSuccess(dir, result, ["Zoë Müller", "José Núñez"]);
     }
 
-    // Invalid arguments and input
-
-    public static TheoryData<string, string[]> InvalidArguments =>
-        new TheoryData<string, string[]>
-        {
-            { "No arguments", [] },
-            { "Empty path", [""] },
-            { "Whitespace-only path", ["   "] },
-            { "Multiple paths", ["one.txt", "two.txt"] }
-        };
-    
     [Theory]
     [MemberData(nameof(InvalidArguments))]
     public async Task Run_InvalidArguments_ReturnsUsageError(string description, string[] args)
@@ -188,9 +188,6 @@ public class ProgramTests
         Assert.Empty(result.Stdout);
         Assert.True(Directory.Exists(dir.File(OutputFile)));
     }
-    
-    // Helpers
-    private sealed record CliResult(int ExitCode, string Stdout, string Stderr);
 
     private static async Task<CliResult> RunAsync(string workingDirectory, params string[] args)
     {
@@ -253,4 +250,7 @@ public class ProgramTests
         string expectedConsole = string.Concat(expected.Select(line => line + Environment.NewLine));
         Assert.Equal(expectedConsole, result.Stdout);
     }
+
+    // Helpers
+    private sealed record CliResult(int ExitCode, string Stdout, string Stderr);
 }

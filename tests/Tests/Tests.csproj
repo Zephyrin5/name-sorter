@@ -10,8 +10,8 @@
         <NoWarn>$(NoWarn);CA1861</NoWarn>
     </PropertyGroup>
     <ItemGroup>
-        <ProjectReference Include="..\..\src\Cli\Cli.csproj" />
-        <ProjectReference Include="..\..\src\Core\Core.csproj" />
+        <ProjectReference Include="..\..\src\Cli\Cli.csproj"/>
+        <ProjectReference Include="..\..\src\Core\Core.csproj"/>
         <Using Include="Xunit"/>
         <PackageReference Include="xunit.v3.assert"/>
         <PackageReference Include="xunit.v3.core"/>
