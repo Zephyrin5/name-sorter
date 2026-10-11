@@ -1,6 +1,5 @@
 using NameSorter.Cli;
 using NameSorter.Tests.Helpers;
-using NameSorter.Tests.Helpers.NameSinks;
 
 namespace NameSorter.Tests.Unit;
 

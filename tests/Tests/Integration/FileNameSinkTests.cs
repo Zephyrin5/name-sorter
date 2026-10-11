@@ -1,6 +1,7 @@
 ﻿using NameSorter.Cli;
 using NameSorter.Core;
 using NameSorter.Tests.Helpers;
+using System.Collections;
 
 namespace NameSorter.Tests.Integration;
 
@@ -63,5 +64,35 @@ public class FileNameSinkTests
         Assert.True(
             exception is IOException or UnauthorizedAccessException,
             $"Unexpected exception: {exception}");
+    }
+    
+    [Fact]
+    public void Write_FailsMidWrite_KeepsExistingFileAndLeavesNoTempFiles()
+    {
+        using TempDirectory dir = new TempDirectory();
+        File.WriteAllText(dir.File(OutputFile), "previous output");
+
+        Assert.Throws<IOException>(
+            () => new FileNameSink(dir.File(OutputFile)).Write(new FailsAfterFirstName()));
+
+        Assert.Equal("previous output", File.ReadAllText(dir.File(OutputFile)));
+        Assert.Equal([dir.File(OutputFile)], Directory.GetFiles(dir.DirectoryPath));
+    }
+
+    /// <summary>Yields one name, then fails, as a disk error mid-write would.</summary>
+    private sealed class FailsAfterFirstName : IReadOnlyList<Name>
+    {
+        public int Count => 2;
+
+        public Name this[int index] =>
+            index == 0 ? new Name(["Ann"], "Lee") : throw new IOException("Simulated failure.");
+
+        public IEnumerator<Name> GetEnumerator()
+        {
+            for (int i = 0; i < Count; i++)
+                yield return this[i];
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }
