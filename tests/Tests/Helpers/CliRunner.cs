@@ -34,6 +34,7 @@ internal static class CliRunner
         catch (OperationCanceledException)
         {
             process.Kill(true);
+            await process.WaitForExitAsync(CancellationToken.None);
             throw;
         }
 
