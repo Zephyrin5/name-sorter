@@ -30,15 +30,10 @@ internal static class NameListParser
             if (string.IsNullOrWhiteSpace(line))
                 continue;
 
-            try
-            {
-                names.Add(NameParser.Parse(line));
-            }
-            catch (FormatException ex)
-            {
-                throw new FormatException(
-                    $"Line {lineNumber}: {ex.Message}", ex);
-            }
+            if (!NameParser.TryParse(line, out Name? name, out string? error))
+                throw new FormatException($"Line {lineNumber}: '{line}' is not a valid name. {error}");
+
+            names.Add(name);
         }
 
         return names.AsReadOnly();

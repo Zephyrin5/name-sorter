@@ -59,7 +59,7 @@ public class NameListParserTests
 
         Assert.StartsWith("Line 4:", exception.Message);
         Assert.Contains(invalidName, exception.Message);
-        Assert.IsType<FormatException>(exception.InnerException);
+        Assert.DoesNotContain("(Parameter", exception.Message);
     }
 
     [Fact]

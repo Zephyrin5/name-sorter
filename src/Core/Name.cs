@@ -6,6 +6,12 @@ namespace NameSorter.Core;
 /// </summary>
 public sealed class Name
 {
+    /// <summary>Fewest given names a name may have.</summary>
+    public const int MinGivenNames = 1;
+
+    /// <summary>Most given names a name may have.</summary>
+    public const int MaxGivenNames = 3;
+    
     /// <summary>Creates a validated name from its parts.</summary>
     /// <param name="givenNames">One to three given names.</param>
     /// <param name="lastName">The last name.</param>
@@ -22,8 +28,8 @@ public sealed class Name
         ArgumentNullException.ThrowIfNull(lastName);
         
         string[] given = [.. givenNames];
-        if (given.Length is < 1 or > 3)
-            throw new ArgumentException("A name needs 1 to 3 given names.", nameof(givenNames));
+        if (given.Length is < MinGivenNames or > MaxGivenNames)
+            throw new ArgumentException($"A name needs {MinGivenNames} to {MaxGivenNames} given names.", nameof(givenNames));
 
         if (given.Any(string.IsNullOrWhiteSpace))
             throw new ArgumentException("Given names must not be blank.", nameof(givenNames));

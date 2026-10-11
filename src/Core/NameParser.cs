@@ -1,30 +1,39 @@
-﻿namespace NameSorter.Core;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace NameSorter.Core;
 
 /// <summary>
-/// Parses a line by splitting on whitespace. The last token is the last name,
-/// and the remaining tokens are the given names, in order.
+/// Parses a line by splitting on whitespace. The last word is the last name,
+/// and the remaining words are the given names, in order.
 /// </summary>
 public static class NameParser
 {
-    /// <summary>Parses a whitespace-separated name.</summary>
-    /// <exception cref="ArgumentNullException">
-    /// The input is null.
-    /// </exception>
-    /// <exception cref="FormatException">
-    /// The input does not contain a valid name.
-    /// </exception>
-    public static Name Parse(string nameString)
+    /// <summary>Attempts to parse a whitespace-separated name.</summary>
+    public static bool TryParse(
+        string? line,
+        [NotNullWhen(true)] out Name? name,
+        [NotNullWhen(false)] out string? error)
     {
-        ArgumentNullException.ThrowIfNull(nameString);
-        try
+        name = null;
+
+        if (string.IsNullOrWhiteSpace(line))
         {
-            ArgumentException.ThrowIfNullOrWhiteSpace(nameString);
-            string[] tokens = nameString.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
-            return new Name(tokens.SkipLast(1), tokens.Last());
+            error = "A name cannot be null, empty, or whitespace-only.";
+            return false;
         }
-        catch (ArgumentException ex)
+
+        string[] words = line.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
+        int givenNameCount = words.Length - 1;
+
+        if (givenNameCount is < Name.MinGivenNames or > Name.MaxGivenNames)
         {
-            throw new FormatException($"'{nameString}' is not a valid name: {ex.Message}", ex);
+            string wordLabel = words.Length == 1 ? "word" : "words";
+            error = $"Expected {Name.MinGivenNames} to {Name.MaxGivenNames} given names and a last name, but found {words.Length} {wordLabel}.";
+            return false;
         }
+
+        name = new Name(words[..^1], words[^1]);
+        error = null;
+        return true;
     }
 }

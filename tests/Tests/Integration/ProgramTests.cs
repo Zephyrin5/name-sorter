@@ -150,6 +150,8 @@ public class ProgramTests
 
         Assert.Equal(2, result.ExitCode);
         Assert.Contains("Line 4:", result.Stderr);
+        Assert.Contains("Expected 1 to 3 given names", result.Stderr);
+        Assert.DoesNotContain("(Parameter", result.Stderr);
         Assert.Empty(result.Stdout);
         if (existingOutput)
             Assert.Equal("previous run", await File.ReadAllTextAsync(dir.File(OutputFile)));

@@ -8,50 +8,63 @@ public class NameParserTests
     [InlineData("Ann Lee", new[] { "Ann" })]
     [InlineData("Ann Marie Lee", new[] { "Ann", "Marie" })]
     [InlineData("Ann Marie Louise Lee", new[] { "Ann", "Marie", "Louise" })]
-    public void Parse_OneToThreeGivenNames_SplitsGivenNamesFromLastName(
+    public void TryParse_OneToThreeGivenNames_SplitsGivenNamesFromLastName(
         string line, string[] expectedGivenNames)
     {
-        Name name = NameParser.Parse(line);
+        bool success = NameParser.TryParse(line, out Name? name, out string? error);
 
+        Assert.True(success, error);
+        Assert.NotNull(name);
+        Assert.Null(error);
         Assert.Equal(expectedGivenNames, name.GivenNames);
         Assert.Equal("Lee", name.LastName);
     }
 
     [Fact]
-    public void Parse_ExtraWhitespaceAndTabs_NormalizesWhitespace()
+    public void TryParse_ExtraWhitespaceAndTabs_NormalizesWhitespace()
     {
-        Name name = NameParser.Parse("  Ann \t Marie   Lee  ");
+        bool success = NameParser.TryParse(
+            "  Ann \t Marie   Lee  ", out Name? name, out string? error);
 
+        Assert.True(success, error);
+        Assert.NotNull(name);
         Assert.Equal("Ann Marie Lee", name.ToString());
     }
 
     [Fact]
-    public void Parse_MixedCase_PreservesOriginalCasing()
+    public void TryParse_MixedCase_PreservesOriginalCasing()
     {
-        Assert.Equal("ann McDonald", NameParser.Parse("ann McDonald").ToString());
+        bool success = NameParser.TryParse(
+            "ann McDonald", out Name? name, out string? error);
+
+        Assert.True(success, error);
+        Assert.NotNull(name);
+        Assert.Equal("ann McDonald", name.ToString());
     }
 
     [Theory]
+    [InlineData(null)]
     [InlineData("")]
     [InlineData("   ")]
+    [InlineData("\t")]
+    public void TryParse_NullOrWhitespace_ReturnsFalseWithError(string? line)
+    {
+        bool success = NameParser.TryParse(line, out Name? name, out string? error);
+
+        Assert.False(success);
+        Assert.Null(name);
+        Assert.False(string.IsNullOrWhiteSpace(error));
+    }
+
+    [Theory]
     [InlineData("Madonna")]
-    public void Parse_FewerThanTwoTokens_ThrowsFormatException(string line)
+    [InlineData("A B C D Lee")]
+    public void TryParse_InvalidNamePartCount_ReturnsFalseWithError(string line)
     {
-        Assert.Throws<FormatException>(() => NameParser.Parse(line));
-    }
+        bool success = NameParser.TryParse(line, out Name? name, out string? error);
 
-    [Fact]
-    public void Parse_FourGivenNames_ThrowsFormatException()
-    {
-        Assert.Throws<FormatException>(() => NameParser.Parse("A B C D Lee"));
-    }
-
-    [Fact]
-    public void Parse_NullInput_ThrowsArgumentNullException()
-    {
-        ArgumentNullException exception = Assert.Throws<ArgumentNullException>(
-            () => NameParser.Parse(null!));
-
-        Assert.Equal("nameString", exception.ParamName);
+        Assert.False(success);
+        Assert.Null(name);
+        Assert.False(string.IsNullOrWhiteSpace(error));
     }
 }

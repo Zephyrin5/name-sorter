@@ -7,7 +7,8 @@ public class NameComparerTests
 
     private static Name N(string line)
     {
-        return NameParser.Parse(line);
+        return NameParser.TryParse(line, out Name? name, out string? error)
+            ? name : throw new FormatException($"'{line}' is not a valid name: {error}");
     }
 
     [Fact]
