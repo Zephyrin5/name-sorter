@@ -1,8 +1,8 @@
 ﻿namespace NameSorter.Core;
 
 /// <summary>
-///     Parses a line by splitting on whitespace. The last token is the last name,
-///     and the remaining tokens are the given names, in order.
+/// Parses a line by splitting on whitespace. The last token is the last name,
+/// and the remaining tokens are the given names, in order.
 /// </summary>
 public static class NameParser
 {
