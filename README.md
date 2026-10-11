@@ -8,11 +8,11 @@ A CLI that sorts names by last name, then given names, and writes the result to 
 
 Install the .NET 10 SDK, then run from the repository root on Windows or Linux:
 
-```sh
+```bash
 dotnet restore NameSorter.slnx
 dotnet build NameSorter.slnx --configuration Release --no-restore
 dotnet test --solution NameSorter.slnx --configuration Release --no-build
-dotnet run --project src/Cli --configuration Release --no-build -- "examples/unsorted-names-list.txt"
+dotnet run --project src/Cli --configuration Release --no-build -- examples/unsorted-names-list.txt
 ```
 
 Replace the example path with your input file; quote paths containing spaces. Tests use the xUnit v3 executable runner and return a nonzero exit code on failure. GitHub Actions runs the same build and test commands on Windows and Linux.
@@ -25,7 +25,7 @@ This example targets Linux x64; use `win-x64` or `osx-arm64` as appropriate:
 ```bash
 dotnet publish src/Cli --configuration Release --runtime linux-x64 --self-contained -p:PublishSingleFile=true --output publish
 
-./publish/name-sorter ./examples/unsorted-names-list.txt
+./publish/name-sorter examples/unsorted-names-list.txt
 ```
 
 ## Behaviour
