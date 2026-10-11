@@ -1,7 +1,7 @@
 ﻿using NameSorter.Core;
 namespace NameSorter.Cli;
 
-internal sealed class NameSortingJob(IReadOnlyList<INameSink> sinks)
+internal sealed class NameSortingJob(IComparer<Name> comparer, IReadOnlyList<INameSink> sinks)
 {
     public void Run(IEnumerable<string> lines)
     {
@@ -9,7 +9,7 @@ internal sealed class NameSortingJob(IReadOnlyList<INameSink> sinks)
         [
             .. NameListParser
                 .ParseLines(lines)
-                .OrderBy(name => name, new NameComparer())
+                .OrderBy(name => name, comparer)
         ];
 
         foreach (INameSink sink in sinks)

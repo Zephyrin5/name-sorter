@@ -1,5 +1,7 @@
 using NameSorter.Cli;
+using NameSorter.Core;
 using System.Text;
+
 const string outputFileName = "sorted-names-list.txt";
 
 if (args.Length != 1 || string.IsNullOrWhiteSpace(args[0]))
@@ -15,7 +17,7 @@ try
     // Order matters: the file sink runs first, so names are printed only after the file was written.
     INameSink[] sinks = [new FileNameSink(outputFileName), new ConsoleNameSink()];
 
-    new NameSortingJob(sinks).Run(File.ReadLines(args[0]));
+    new NameSortingJob(new NameComparer(), sinks).Run(File.ReadLines(args[0]));
 
     return 0;
 }

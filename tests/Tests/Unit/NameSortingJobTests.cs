@@ -1,4 +1,5 @@
 using NameSorter.Cli;
+using NameSorter.Core;
 using NameSorter.Tests.Helpers;
 
 namespace NameSorter.Tests.Unit;
@@ -10,7 +11,7 @@ public class NameSortingJobTests
     {
         RecordingSink sink = new RecordingSink();
 
-        new NameSortingJob([sink]).Run(BriefExample.Input);
+        CreateJob(sink).Run(BriefExample.Input);
 
         Assert.Equal(1, sink.WriteCount);
         Assert.Equal(BriefExample.Expected, sink.Received);
@@ -22,7 +23,7 @@ public class NameSortingJobTests
         RecordingSink first = new RecordingSink();
         RecordingSink second = new RecordingSink();
 
-        new NameSortingJob([first, second]).Run(["Bob Lee", "Ann Lee"]);
+        CreateJob(first, second).Run(["Bob Lee", "Ann Lee"]);
 
         Assert.Equal(["Ann Lee", "Bob Lee"], first.Received);
         Assert.Equal(["Ann Lee", "Bob Lee"], second.Received);
@@ -35,9 +36,21 @@ public class NameSortingJobTests
         RecordingSink first = new RecordingSink("first", calls);
         RecordingSink second = new RecordingSink("second", calls);
 
-        new NameSortingJob([first, second]).Run(["Ann Lee"]);
+        CreateJob(first, second).Run(["Ann Lee"]);
 
         Assert.Equal(["first", "second"], calls);
+    }
+
+    [Fact]
+    public void Run_CustomComparer_UsesProvidedOrdering()
+    {
+        RecordingSink sink = new RecordingSink();
+        IComparer<Name> comparer = Comparer<Name>.Create(
+            (x, y) => StringComparer.Ordinal.Compare(y.LastName, x.LastName));
+
+        new NameSortingJob(comparer, [sink]).Run(["Ann Lee", "Bob Smith"]);
+
+        Assert.Equal(["Bob Smith", "Ann Lee"], sink.Received);
     }
 
     [Theory]
@@ -47,7 +60,8 @@ public class NameSortingJobTests
     {
         RecordingSink sink = new RecordingSink();
 
-        FormatException exception = Assert.Throws<FormatException>(() => new NameSortingJob([sink]).Run(["Ann Lee", invalidName]));
+        FormatException exception = Assert.Throws<FormatException>(
+            () => CreateJob(sink).Run(["Ann Lee", invalidName]));
 
         Assert.StartsWith("Line 2:", exception.Message);
         Assert.Equal(0, sink.WriteCount);
@@ -58,7 +72,7 @@ public class NameSortingJobTests
     {
         RecordingSink sink = new RecordingSink();
 
-        new NameSortingJob([sink]).Run(["", "   "]);
+        CreateJob(sink).Run(["", "   "]);
 
         Assert.Equal(1, sink.WriteCount);
         Assert.Empty(sink.Received);
@@ -70,7 +84,7 @@ public class NameSortingJobTests
         RecordingSink sink = new RecordingSink();
         string[] input = ["ann lee", "Ann Lee", "ANN LEE", "Ann Lee"];
 
-        new NameSortingJob([sink]).Run(input);
+        CreateJob(sink).Run(input);
 
         Assert.Equal(input, sink.Received);
     }
@@ -80,8 +94,13 @@ public class NameSortingJobTests
     {
         RecordingSink sink = new RecordingSink();
 
-        Assert.Throws<ArgumentNullException>(() => new NameSortingJob([sink]).Run(null!));
+        Assert.Throws<ArgumentNullException>(() => CreateJob(sink).Run(null!));
 
         Assert.Equal(0, sink.WriteCount);
+    }
+
+    private static NameSortingJob CreateJob(params INameSink[] sinks)
+    {
+        return new NameSortingJob(new NameComparer(), sinks);
     }
 }
