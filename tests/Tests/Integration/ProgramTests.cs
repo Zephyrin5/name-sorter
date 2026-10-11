@@ -6,17 +6,6 @@ public class ProgramTests
 {
     private const string OutputFile = "sorted-names-list.txt";
 
-    // Invalid arguments and input
-
-    public static TheoryData<string, string[]> InvalidArguments =>
-        new TheoryData<string, string[]>
-        {
-            { "No arguments", [] },
-            { "Empty path", [""] },
-            { "Whitespace-only path", ["   "] },
-            { "Multiple paths", ["one.txt", "two.txt"] }
-        };
-
     // Successful sorting and output
     [Fact]
     public async Task Run_BriefExample_PrintsNamesAndWritesFileInWorkingDirectory()
@@ -119,6 +108,17 @@ public class ProgramTests
 
         AssertSuccess(dir, result, ["Zoë Müller", "José Núñez"]);
     }
+    
+    // Invalid arguments and input
+
+    public static TheoryData<string, string[]> InvalidArguments =>
+        new TheoryData<string, string[]>
+        {
+            { "No arguments", [] },
+            { "Empty path", [""] },
+            { "Whitespace-only path", ["   "] },
+            { "Multiple paths", ["one.txt", "two.txt"] }
+        };
 
     [Theory]
     [MemberData(nameof(InvalidArguments))]
