@@ -18,7 +18,7 @@ public class NameParserTests
     }
 
     [Fact]
-    public void Parse_ExtraWhitespaceAndTabs_IsTolerated()
+    public void Parse_ExtraWhitespaceAndTabs_NormalizesWhitespace()
     {
         Name name = NameParser.Parse("  Ann \t Marie   Lee  ");
 
@@ -26,7 +26,7 @@ public class NameParserTests
     }
 
     [Fact]
-    public void Parse_PreservesOriginalCasing()
+    public void Parse_MixedCase_PreservesOriginalCasing()
     {
         Assert.Equal("ann McDonald", NameParser.Parse("ann McDonald").ToString());
     }
@@ -47,7 +47,7 @@ public class NameParserTests
     }
 
     [Fact]
-    public void Parse_Null_ThrowsArgumentNullException()
+    public void Parse_NullInput_ThrowsArgumentNullException()
     {
         ArgumentNullException exception = Assert.Throws<ArgumentNullException>(
             () => NameParser.Parse(null!));
