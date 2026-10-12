@@ -1,12 +1,37 @@
 # NameSorter
 
-[![Build and test](https://github.com/zephyrin5/name-sorter/actions/workflows/ci.yml/badge.svg)](https://github.com/zephyrin5/name-sorter/actions/workflows/ci.yml)
+[![Build and test](https://github.com/Zephyrin5/name-sorter/actions/workflows/ci.yml/badge.svg)](https://github.com/Zephyrin5/name-sorter/actions/workflows/ci.yml)
 
-A CLI that sorts names by last name, then given names, and writes the result to the screen and `sorted-names-list.txt`.
+A .NET 10 CLI that sorts names by last name, then given names, and writes the result to the console and `sorted-names-list.txt`.
 
-## Build, test and run
+## Run a downloaded build
 
-Install the .NET 10 SDK, then run from the repository root on Windows or Linux:
+Download the ZIP for your platform from the [latest release](https://github.com/Zephyrin5/name-sorter/releases/latest):
+
+| Platform | Asset |
+| --- | --- |
+| Windows x64 | `name-sorter-win-x64.zip` |
+| Linux x64 | `name-sorter-linux-x64.zip` |
+| macOS Apple Silicon | `name-sorter-osx-arm64.zip` |
+
+Extract it and open a terminal in the extracted folder. No .NET installation is required. A sample input is at `examples/unsorted-names-list.txt` in this repo; replace the path below with your own file and quote paths containing spaces.
+
+**Windows (PowerShell):**
+
+```powershell
+.\name-sorter.exe .\unsorted-names-list.txt
+```
+
+**Linux / macOS:**
+
+```bash
+chmod +x ./name-sorter
+./name-sorter ./unsorted-names-list.txt
+```
+
+## Build, test and run from source
+
+Install the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0), then run from the repository root:
 
 ```bash
 dotnet restore NameSorter.slnx
@@ -15,17 +40,12 @@ dotnet test --solution NameSorter.slnx --configuration Release --no-build
 dotnet run --project src/Cli --configuration Release --no-build -- examples/unsorted-names-list.txt
 ```
 
-Replace the example path with your input file; quote paths containing spaces. Tests use the xUnit v3 executable runner and return a nonzero exit code on failure. GitHub Actions runs the same build and test commands on Windows and Linux.
+Replace the example path with your input file. GitHub Actions runs the build and tests on Windows and Linux, then publishes platform builds as workflow artifacts.
 
-## Publish and run
-
-To create a self-contained executable, publish for your platform.
-This example targets Linux x64; use `win-x64` or `osx-arm64` as appropriate:
+To publish locally, select a runtime identifier such as `linux-x64`, `win-x64` or `osx-arm64`:
 
 ```bash
 dotnet publish src/Cli --configuration Release --runtime linux-x64 --self-contained -p:PublishSingleFile=true --output publish
-
-./publish/name-sorter examples/unsorted-names-list.txt
 ```
 
 ## Behavior
@@ -45,10 +65,11 @@ Exit codes: `0` success, `1` invalid arguments, `2` invalid input, `3` I/O failu
 
 - **Core:** `Name` holds immutable, validated name parts; `NameParser` parses individual names; `NameComparer` defines ordering. No file or console I/O.
 - **Cli:** `NameListParser` handles lines and line numbers; `NameSortingJob` coordinates parsing, sorting and output; `INameSink` abstracts file and console output. `Program.cs` configures the application and maps failures to exit codes.
-- **Tests:** Unit tests cover the model, parsers, comparer, job orchestration and console sink. Integration tests cover the file sink and run the built CLI against real files, including a 1,000-name input.
+- **Tests:** Unit tests cover the model, parsers, comparer, job and console sink. Integration tests cover the file sink and run the built CLI against real files, including a 1,000-name input.
 
-`INameSink` represents the two required output destinations. Adding another destination requires a new implementation and an entry in the sink array. Parsing and comparison are tested directly; file reading uses the standard library and is covered by integration tests.
+Adding another output destination requires an `INameSink` implementation and an entry in the sink array in `Program.cs`.
 
-## Notes on the brief
+## Note on the brief
 
 The example input contains "Vaugh Lewis", but its expected output shows "Vaughn Lewis". The sample file and tests use "Vaughn" consistently; the sorter does not correct spelling.
+
