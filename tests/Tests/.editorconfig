@@ -1,6 +1,4 @@
-﻿root = true
-
-# Target all C# files
+﻿# Target all C# files
 [**/*Tests.cs]
 
 # Turn off JetBrains' native Rider rule (Nullable Warning Suppression Is Used)
