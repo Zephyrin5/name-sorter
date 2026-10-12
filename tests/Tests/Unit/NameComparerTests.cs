@@ -48,9 +48,9 @@ public class NameComparerTests
     }
 
     [Fact]
-    public void Compare_AccentedLastName_UsesInvariantCulture()
+    public void Compare_AccentedLastName_SortsAfterAsciiLetters()
     {
-        Assert.True(_comparer.Compare(NameOf("Ann Äbel"), NameOf("Ann Zeller")) < 0);
+        Assert.True(_comparer.Compare(NameOf("Ann Äbel"), NameOf("Ann Zeller")) > 0);
     }
 
     [Fact]

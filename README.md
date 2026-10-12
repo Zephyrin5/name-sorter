@@ -28,18 +28,18 @@ dotnet publish src/Cli --configuration Release --runtime linux-x64 --self-contai
 ./publish/name-sorter examples/unsorted-names-list.txt
 ```
 
-## Behaviour
+## Behavior
 
 - Each nonblank line must contain one to three given names followed by a last name.
-- Blank lines are skipped. Leading and trailing whitespace is removed, and spaces or tabs between name parts are normalized to single spaces. Spelling and casing are preserved.
+- Blank lines are skipped. Leading and trailing whitespace is removed, and whitespace between name parts is normalized to single spaces. Spelling and casing are preserved.
 - Names are sorted by last name, then each given name in order. A shorter matching sequence sorts first. Equal sort keys retain input order, and duplicates are preserved.
-- Comparison uses InvariantCultureIgnoreCase for case-insensitive, culture-invariant linguistic ordering; it does not follow language-specific alphabetical rules.
-- Output replaces `sorted-names-list.txt` in the **current working directory**, regardless of the input file's location. Empty or blank-only input produces an empty file.
+- Comparison uses `StringComparer.OrdinalIgnoreCase` for case-insensitive, non-linguistic ordering. For example, `Äbel` sorts after `Zeller`.
+- Output overwrites `sorted-names-list.txt` in the **current working directory**, regardless of the input file's location. Empty or blank-only input produces an empty file.
 - All input is validated before writing. Invalid input reports its physical line number to stderr, leaves existing output untouched, and prints no names.
-- Names are printed only after the output file has been written successfully.
-- The last token on a line is always the last name. Suffixes such as "Jr." and multi-word surnames such as "Van Dyke" are not recognised: "John Smith Jr." is read as given names "John Smith" and last name "Jr.".
+- The output file is replaced only after a temporary file has been written successfully. Names are printed after the output file has been replaced.
+- The final word is always the last name. Suffixes and multi-word surnames are not recognized: `John Smith Jr.` is read as given names `John Smith` and last name `Jr.`.
 
-Exit codes: `0` success, `1` invalid arguments, `2` invalid input, `3` file read/write failure.
+Exit codes: `0` success, `1` invalid arguments, `2` invalid input, `3` I/O failure.
 
 ## Structure and design
 

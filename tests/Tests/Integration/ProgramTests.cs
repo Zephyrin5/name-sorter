@@ -44,10 +44,10 @@ public class ProgramTests
         [
             .. input
                 .Select(line => new { Line = line, Parts = line.Split(' ') })
-                .OrderBy(x => x.Parts[^1], StringComparer.InvariantCultureIgnoreCase)
-                .ThenBy(x => x.Parts[0], StringComparer.InvariantCultureIgnoreCase)
-                .ThenBy(x => x.Parts.Length > 2 ? x.Parts[1] : "", StringComparer.InvariantCultureIgnoreCase)
-                .ThenBy(x => x.Parts.Length > 3 ? x.Parts[2] : "", StringComparer.InvariantCultureIgnoreCase)
+                .OrderBy(x => x.Parts[^1], StringComparer.OrdinalIgnoreCase)
+                .ThenBy(x => x.Parts[0], StringComparer.OrdinalIgnoreCase)
+                .ThenBy(x => x.Parts.Length > 2 ? x.Parts[1] : "", StringComparer.OrdinalIgnoreCase)
+                .ThenBy(x => x.Parts.Length > 3 ? x.Parts[2] : "", StringComparer.OrdinalIgnoreCase)
                 .Select(x => x.Line)
         ];
 
